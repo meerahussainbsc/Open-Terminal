@@ -1,0 +1,75 @@
+<!-- order.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order - Open Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center h-screen font-sans">
+    <nav class="w-full bg-gray-800 py-4 px-6 flex justify-between items-center fixed top-0 shadow-lg">
+        <h1 class="text-xl font-bold text-blue-400">Open Terminal</h1>
+        <div>
+            <a href="/" class="text-white px-4 hover:text-blue-400 transition">Home</a>
+            <a href="/about" class="text-white px-4 hover:text-blue-400 transition">About</a>
+        </div>
+    </nav>
+    
+    <div class="mt-20 w-full max-w-md bg-gray-800 p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-white text-center">Place an Order</h2>
+        <form id="orderForm" class="mt-4">
+            <label class="block text-gray-300">Symbol:</label>
+            <input type="text" id="symbol" name="symbol" class="w-full px-4 py-2 mt-2 rounded bg-gray-700 text-white" required>
+            
+            <label class="block text-gray-300 mt-4">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" class="w-full px-4 py-2 mt-2 rounded bg-gray-700 text-white" required>
+            
+            <label class="block text-gray-300 mt-4">Exchange:</label>
+            <select id="exchange" name="exchange" class="w-full px-4 py-2 mt-2 rounded bg-gray-700 text-white" required>
+                <option value="NSE">NSE</option>
+                <option value="BSE">BSE</option>
+                <option value="NFO">NFO</option>
+                <option value="MCX">MCX</option>
+            </select>
+            
+            <label class="block text-gray-300 mt-4">Order Type:</label>
+            <div class="flex gap-4 mt-2">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="order_type" value="buy" class="form-radio text-green-500" required>
+                    <span class="ml-2">Buy</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="order_type" value="sell" class="form-radio text-red-500" required>
+                    <span class="ml-2">Sell</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="w-full mt-6 px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">Submit</button>
+        </form>
+        <p id="responseMessage" class="mt-4 font-bold text-lg"></p>
+    </div>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const symbol = document.getElementById('symbol').value;
+            const quantity = document.getElementById('quantity').value;
+            const exchange = document.getElementById('exchange').value;
+            const orderType = document.querySelector('input[name="order_type"]:checked').value;
+            
+            const response = await fetch('/api/post_example', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol, quantity, exchange, order_type: orderType })
+            });
+            
+            const data = await response.json();
+            const responseMessage = document.getElementById('responseMessage');
+            responseMessage.innerText = data.message || data.error;
+            responseMessage.style.color = orderType === 'buy' ? 'green' : 'red';
+        });
+    </script>
+</body>
+</html>
